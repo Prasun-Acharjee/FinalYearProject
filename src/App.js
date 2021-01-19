@@ -15,96 +15,88 @@ const papaparseOptions = {
   skipEmptyLines: true,
   transformHeader: (header) => header.toLowerCase().replace(/\W/g, ""),
 };
-const data = [
-  {
-    name: "Post A",
-    Likes: 4000,
-    Dislikes: 2400,
-    amt: 2400,
-  },
-  {
-    name: "Post B",
-    Likes: 3000,
-    Dislikes: 1398,
-    amt: 2210,
-  },
-  {
-    name: "Post C",
-    Likes: 2000,
-    Dislikes: 9800,
-    amt: 2290,
-  },
-  {
-    name: "Post D",
-    Likes: 2780,
-    Dislikes: 3908,
-    amt: 2000,
-  },
-  {
-    name: "Post E",
-    Likes: 1890,
-    Dislikes: 4800,
-    amt: 2181,
-  },
-  {
-    name: "Post F",
-    Likes: 2390,
-    Dislikes: 3800,
-    amt: 2500,
-  },
-  {
-    name: "Post G",
-    Likes: 3490,
-    Dislikes: 4300,
-    amt: 2100,
-  },
-];
 
 class App extends Component {
   constructor(props) {
     super(props);
-    this.state = { data: [] };
+    this.state = { data: [], xaxis: "", yaxis: "" };
   }
   render() {
     return (
-      <div>
+      <div
+        style={{
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
         <LineChart
           width={1000}
           height={500}
           data={this.state.data}
           margin={{
-            top: 30,
-            right: 30,
-            left: 20,
-            bottom: 5,
+            top: 15,
+            bottom: 15,
           }}
         >
           <CartesianGrid />
-          <XAxis dataKey="mileagethousands" />
-          <YAxis />
+          <XAxis dataKey={this.state.xaxis} />
+          <YAxis dataKey={this.state.yaxis} />
           <Tooltip />
           <Legend />
           <Line
             type="monotone"
-            dataKey="price"
+            dataKey={this.state.yaxis}
             stroke="#8884d8"
             activeDot={{ r: 8 }}
           />
-          <Line type="monotone" dataKey="mileagethousands" stroke="#82ca9d" />
+          <Line type="monotone" dataKey={this.state.xaxis} stroke="#82ca9d" />
         </LineChart>
         <CSVReader
           onFileLoaded={(data, fileInfo) =>
             this.setState(
               {
-                data: data.sort(function (a, b) {
-                  return a.mileagethousands - b.mileagethousands;
-                }),
+                data: data,
+                xaxis: "",
+                yaxis: "",
               },
               () => console.log(data, fileInfo)
             )
           }
           parserOptions={papaparseOptions}
         />
+        {this.state.data?.length > 0 && (
+          <>
+            <select
+              placeholder="select x axis"
+              onChange={(e) =>
+                this.setState(
+                  {
+                    xaxis: e.target.value,
+                    data: this.state.data.sort(function (a, b) {
+                      return a[e.target.value] - b[e.target.value];
+                    }),
+                  },
+                  () => console.log(this.state)
+                )
+              }
+            >
+              {Object.keys(this.state.data[0])?.map((item) => (
+                <option value={item}>{item}</option>
+              ))}
+            </select>
+            <select
+              placeholder="select y axis"
+              onChange={(e) => this.setState({ yaxis: e.target.value })}
+            >
+              {Object.keys(this.state.data[0])?.map((item) => (
+                <option value={item}>{item}</option>
+              ))}
+            </select>
+          </>
+        )}
       </div>
     );
   }
