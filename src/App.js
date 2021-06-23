@@ -9,6 +9,7 @@ import {
   Legend,
 } from "recharts";
 import CSVReader from "react-csv-reader";
+import NodeGraph from "./nodeGraph";
 const papaparseOptions = {
   header: true,
   dynamicTyping: true,
@@ -97,6 +98,7 @@ class App extends Component {
             </select>
           </>
         )}
+        <NodeGraph />
       </div>
     );
   }
